@@ -7,6 +7,10 @@ homedir = os.path.expanduser('~')
 
 appdir = os.path.join(homedir, '.bkup')
 
+tmpdir = os.path.join(appdir, 'tmp')
+if not os.path.exists(tmpdir):
+    os.makedirs(tmpdir)
+
 ### clear the destination directory prior to each run (caveat emptor)
 cleardestdir=True
 
@@ -16,8 +20,17 @@ backupfile='home.tgz'
 backupdir=homedir
 ## where to move tgz file
 destdir=os.path.join(homedir, 'tmp')
+
+def write_list_to_file(ls, fl):
+	with open(fl, 'w') as out_file:
+	    out_file.write('\n'.join(ls))
+
 ## include patterns
-includefile=os.path.join(homedir, '.backup-include')
+# includefile=os.path.join(homedir, '.backup-include')
+includes = ['./.git-completion.bash','./.gitconfig','./test/a','./test/one.txt','./test/b/c.txt','./Code/provision/']
+includefile=os.path.join(tmpdir, '.include')
+write_list_to_file(includes, includefile)
+
 ## exclude patterns
 excludefile=os.path.join(homedir, '.backup-exclude')
 
