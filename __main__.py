@@ -66,3 +66,6 @@ os.chdir(destdir)
 # ## extract the archive
 # tar xzvf $backupfile
 call(["tar", "xzvf", backupfile])
+
+# remove tmp dir
+shutil.rmtree(tmpdir)
