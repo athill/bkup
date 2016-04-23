@@ -4,9 +4,15 @@ import os, shutil, sys
 from subprocess import call, check_call
 from pprint import pprint
 
+### clear the destination directory prior to each run (caveat emptor)
+cleardestdir=True
+
+
 homedir = os.path.expanduser('~') 
 
 appdir = os.path.join(homedir, '.bkup')
+if not os.path.exists(appdir):
+    os.makedirs(appdir)
 
 configfile = os.path.join(appdir, 'config')
 
@@ -14,28 +20,11 @@ tmpdir = os.path.join(appdir, 'tmp')
 if not os.path.exists(tmpdir):
     os.makedirs(tmpdir)
 
-# ### clear the destination directory prior to each run (caveat emptor)
-# cleardestdir=True
-
-# ## file name (no path) of gunzipped tarball
-# backupfile='home.tgz'
-# ## backup directory
-# backupdir=homedir
-# ## where to move tgz file
-# destdir=os.path.join(homedir, 'tmp')
-
 def write_list_to_file(fl, ls):
 	with open(fl, 'w') as out_file:
 	    out_file.write('\n'.join(ls))
 
-def write_lists_to_files(file2list):
-	for fl, ls in enumerate(file2list):
-		print(fl)
-		write_list_to_file(fl, ls)
-
 defaults = {
-	'cleardestdir': True,
-	'backupfile': 'home.tgz',
 	'backupdir': homedir,
 	'destdir': os.path.join(homedir, 'tmp'),
 	'includes': ['./.git-completion.bash','./.gitconfig','./test/a','./test/one.txt','./test/b/c.txt','./Code/provision/'],
@@ -43,41 +32,43 @@ defaults = {
 }
 
 sys.path.append(os.path.dirname(os.path.expanduser(configfile)))
-from config import config
+from config import profiles
 
-pprint(config)
+if len(sys.argv) != 2:
+	print("usage: bkup <profile>. Configured profiles are: "+', '.join(profiles.keys()))
+	exit(1)
 
-# config={}
+profile = sys.argv[1]
+backupfile=profile+'.tgz'
 
-# config.update(defaults)
+if not profile in profiles.keys():
+	print("Error: Invalid profile, '"+profile+"'. Configured profiles are: "+', '.join(profiles.keys()))
+	exit(1)
+
+config = profiles[profile]
+for key in defaults.keys():
+	if not key in config:
+		config[key] = defaults[key]
 
 ## include patterns
-# includefile=os.path.join(homedir, '.backup-include')
-# includes = ['./.git-completion.bash','./.gitconfig','./test/a','./test/one.txt','./test/b/c.txt','./Code/provision/']
 includefile=os.path.join(tmpdir, 'include')
 write_list_to_file(includefile, config['includes'])
 
 ## exclude patterns
-# excludefile=os.path.join(homedir, '.backup-exclude')
-# excludes=['./test/a/b.txt', '*.git']
 excludefile=os.path.join(tmpdir, 'exclude')
 write_list_to_file(excludefile, config['excludes'])
 
-# write_lists_to_files({
-# 	includefile: includes,
-# 	excludefile: excludes
-# })
-
 ## tar commands based on tar implemntation (gnu or bsd)
-tar_gnu_str="tar -czvf "+config['backupfile'] +" --files-from="+includefile+" --exclude-from=" + excludefile
+tar_gnu_str="tar -czvf "+backupfile +" --files-from="+includefile+" --exclude-from=" + excludefile
 tar_gnu=tar_gnu_str.split(' ')
-# tar_gnu=['tar', '-czvf', config['backupfile'], '--files-from='+includefile,  '--exclude-from='+excludefile]
+# tar_gnu=['tar', '-czvf', backupfile, '--files-from='+includefile,  '--exclude-from='+excludefile]
 
-tar_bsd="tar -czvf $backupfile --include-from=$includefile --exclude-from=$excludefile"
+# tar_bsd="tar -czvf $backupfile --include-from=$includefile --exclude-from=$excludefile"
+tar_bsd_str="tar -czvf "+backupfile +" --include-from="+includefile+" --exclude-from=" + excludefile
+tar_bsd=tar_bsd_str.split(' ')
 
 
-
-if config['cleardestdir']:
+if cleardestdir:
 	# rm -rf $destdir/*
 	shutil.rmtree(config['destdir'])
 	os.mkdir(config['destdir'])
@@ -94,7 +85,7 @@ call(tar_gnu)
 
 # ## move archive to destination
 # mv $backupfile ['destdir']/
-shutil.move(config['backupfile'], config['destdir'])
+shutil.move(backupfile, config['destdir'])
 
 # #### this part is for debugging, you could impement backup rotations, etc. here
 
@@ -103,7 +94,7 @@ os.chdir(config['destdir'])
 
 # ## extract the archive
 # tar xzvf $backupfile
-call(["tar", "xzvf", config['backupfile']])
+call(["tar", "xzvf", backupfile])
 
 # remove tmp dir
 shutil.rmtree(tmpdir)
