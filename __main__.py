@@ -11,15 +11,15 @@ tmpdir = os.path.join(appdir, 'tmp')
 if not os.path.exists(tmpdir):
     os.makedirs(tmpdir)
 
-### clear the destination directory prior to each run (caveat emptor)
-cleardestdir=True
+# ### clear the destination directory prior to each run (caveat emptor)
+# cleardestdir=True
 
-## file name (no path) of gunzipped tarball
-backupfile='home.tgz'
-## backup directory
-backupdir=homedir
-## where to move tgz file
-destdir=os.path.join(homedir, 'tmp')
+# ## file name (no path) of gunzipped tarball
+# backupfile='home.tgz'
+# ## backup directory
+# backupdir=homedir
+# ## where to move tgz file
+# destdir=os.path.join(homedir, 'tmp')
 
 def write_list_to_file(fl, ls):
 	with open(fl, 'w') as out_file:
@@ -61,10 +61,12 @@ write_list_to_file(excludefile, config['excludes'])
 # })
 
 ## tar commands based on tar implemntation (gnu or bsd)
-# tar_gnu="tar -czvf $backupfile --files-from=$includefile --exclude-from=$excludefile"
-tar_gnu=['tar', '-czvf', backupfile, '--files-from='+includefile,  '--exclude-from='+excludefile]
+tar_gnu_str="tar -czvf "+config['backupfile'] +"--files-from="includefile+" --exclude-from=" + excludefile
+tar_gnu=tar_gnu_str.split(' ')
+# tar_gnu=['tar', '-czvf', config['backupfile'], '--files-from='+includefile,  '--exclude-from='+excludefile]
 
 tar_bsd="tar -czvf $backupfile --include-from=$includefile --exclude-from=$excludefile"
+
 
 
 if config['cleardestdir']:
