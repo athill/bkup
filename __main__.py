@@ -21,18 +21,44 @@ backupdir=homedir
 ## where to move tgz file
 destdir=os.path.join(homedir, 'tmp')
 
-def write_list_to_file(ls, fl):
+def write_list_to_file(fl, ls):
 	with open(fl, 'w') as out_file:
 	    out_file.write('\n'.join(ls))
 
+def write_lists_to_files(file2list):
+	for fl, ls in enumerate(file2list):
+		print(fl)
+		write_list_to_file(fl, ls)
+
+defaults = {
+	'cleardestdir': True,
+	'backupfile': 'home.tgz',
+	'backupdir': homedir,
+	'destdir': os.path.join(homedir, 'tmp'),
+	'includes': ['./.git-completion.bash','./.gitconfig','./test/a','./test/one.txt','./test/b/c.txt','./Code/provision/'],
+	'excludes': ['./test/a/b.txt', '*.git']
+}
+
+config={}
+
+config.update(defaults)
+
 ## include patterns
 # includefile=os.path.join(homedir, '.backup-include')
-includes = ['./.git-completion.bash','./.gitconfig','./test/a','./test/one.txt','./test/b/c.txt','./Code/provision/']
-includefile=os.path.join(tmpdir, '.include')
-write_list_to_file(includes, includefile)
+# includes = ['./.git-completion.bash','./.gitconfig','./test/a','./test/one.txt','./test/b/c.txt','./Code/provision/']
+includefile=os.path.join(tmpdir, 'include')
+write_list_to_file(includefile, config['includes'])
 
 ## exclude patterns
-excludefile=os.path.join(homedir, '.backup-exclude')
+# excludefile=os.path.join(homedir, '.backup-exclude')
+# excludes=['./test/a/b.txt', '*.git']
+excludefile=os.path.join(tmpdir, 'exclude')
+write_list_to_file(excludefile, config['excludes'])
+
+# write_lists_to_files({
+# 	includefile: includes,
+# 	excludefile: excludes
+# })
 
 ## tar commands based on tar implemntation (gnu or bsd)
 # tar_gnu="tar -czvf $backupfile --files-from=$includefile --exclude-from=$excludefile"
@@ -41,31 +67,31 @@ tar_gnu=['tar', '-czvf', backupfile, '--files-from='+includefile,  '--exclude-fr
 tar_bsd="tar -czvf $backupfile --include-from=$includefile --exclude-from=$excludefile"
 
 
-if cleardestdir:
+if config['cleardestdir']:
 	# rm -rf $destdir/*
-	shutil.rmtree(destdir)
-	os.mkdir(destdir)
+	shutil.rmtree(config['destdir'])
+	os.mkdir(config['destdir'])
 
 # ## go to back up direcroty
 # cd $backupdir
-os.chdir(backupdir)
+os.chdir(config['backupdir'])
 
 # ## wrap it up (create g-zipped tarball)
 # $tar_gnu || $tar_bsd
 call(tar_gnu)
 
 # ## move archive to destination
-# mv $backupfile $destdir/
-shutil.move(backupfile, destdir)
+# mv $backupfile ['destdir']/
+shutil.move(config['backupfile'], config['destdir'])
 
 # #### this part is for debugging, you could impement backup rotations, etc. here
 
-# cd $destdir
-os.chdir(destdir)
+# cd ['destdi']r
+os.chdir(config['destdir'])
 
 # ## extract the archive
 # tar xzvf $backupfile
-call(["tar", "xzvf", backupfile])
+call(["tar", "xzvf", config['backupfile']])
 
 # remove tmp dir
 shutil.rmtree(tmpdir)
