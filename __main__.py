@@ -2,10 +2,13 @@
 
 import os, shutil, sys
 from subprocess import call, check_call
+from pprint import pprint
 
 homedir = os.path.expanduser('~') 
 
 appdir = os.path.join(homedir, '.bkup')
+
+configfile = os.path.join(appdir, 'config')
 
 tmpdir = os.path.join(appdir, 'tmp')
 if not os.path.exists(tmpdir):
@@ -39,9 +42,14 @@ defaults = {
 	'excludes': ['./test/a/b.txt', '*.git']
 }
 
-config={}
+sys.path.append(os.path.dirname(os.path.expanduser(configfile)))
+from config import config
 
-config.update(defaults)
+pprint(config)
+
+# config={}
+
+# config.update(defaults)
 
 ## include patterns
 # includefile=os.path.join(homedir, '.backup-include')
@@ -61,7 +69,7 @@ write_list_to_file(excludefile, config['excludes'])
 # })
 
 ## tar commands based on tar implemntation (gnu or bsd)
-tar_gnu_str="tar -czvf "+config['backupfile'] +"--files-from="includefile+" --exclude-from=" + excludefile
+tar_gnu_str="tar -czvf "+config['backupfile'] +" --files-from="+includefile+" --exclude-from=" + excludefile
 tar_gnu=tar_gnu_str.split(' ')
 # tar_gnu=['tar', '-czvf', config['backupfile'], '--files-from='+includefile,  '--exclude-from='+excludefile]
 
@@ -78,6 +86,8 @@ if config['cleardestdir']:
 # cd $backupdir
 os.chdir(config['backupdir'])
 
+
+pprint(tar_gnu_str)
 # ## wrap it up (create g-zipped tarball)
 # $tar_gnu || $tar_bsd
 call(tar_gnu)
