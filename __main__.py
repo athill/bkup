@@ -1,11 +1,11 @@
 #!/usr/bin/python
 
-import os, shutil, sys
+import os, shutil, sys, tarfile
 from subprocess import call, check_call
 from pprint import pprint
 
-### clear the destination directory prior to each run (caveat emptor)
-cleardestdir=True
+### 
+debug=True
 
 
 homedir = os.path.expanduser('~') 
@@ -16,19 +16,28 @@ if not os.path.exists(appdir):
 
 configfile = os.path.join(appdir, 'config')
 
-tmpdir = os.path.join(appdir, 'tmp')
-if not os.path.exists(tmpdir):
-    os.makedirs(tmpdir)
+template="""import os
 
-def write_list_to_file(fl, ls):
-	with open(fl, 'w') as out_file:
-	    out_file.write('\n'.join(ls))
+homedir = os.path.expanduser('~') 
+
+profiles = {
+	'home': {
+		'backupdir': homedir,
+		'destdir': os.path.join(homedir, 'tmp'),
+		'files': []
+	}	
+}
+"""
+
+if not os.path.exists(configfile+'.py'):
+	with open(configfile+'.py', "w") as text_file:
+		text_file.write(template)
+
 
 defaults = {
 	'backupdir': homedir,
 	'destdir': os.path.join(homedir, 'tmp'),
-	'includes': ['./.git-completion.bash','./.gitconfig','./test/a','./test/one.txt','./test/b/c.txt','./Code/provision/'],
-	'excludes': ['./test/a/b.txt', '*.git']
+	'files': ['./.git-completion.bash','./.gitconfig','./test/a','./test/one.txt','./test/b/c.txt','./Code/provision/']
 }
 
 sys.path.append(os.path.dirname(os.path.expanduser(configfile)))
@@ -50,25 +59,9 @@ for key in defaults.keys():
 	if not key in config:
 		config[key] = defaults[key]
 
-## include patterns
-includefile=os.path.join(tmpdir, 'include')
-write_list_to_file(includefile, config['includes'])
-
-## exclude patterns
-excludefile=os.path.join(tmpdir, 'exclude')
-write_list_to_file(excludefile, config['excludes'])
-
-## tar commands based on tar implemntation (gnu or bsd)
-tar_gnu_str="tar -czvf "+backupfile +" --files-from="+includefile+" --exclude-from=" + excludefile
-tar_gnu=tar_gnu_str.split(' ')
-# tar_gnu=['tar', '-czvf', backupfile, '--files-from='+includefile,  '--exclude-from='+excludefile]
-
-# tar_bsd="tar -czvf $backupfile --include-from=$includefile --exclude-from=$excludefile"
-tar_bsd_str="tar -czvf "+backupfile +" --include-from="+includefile+" --exclude-from=" + excludefile
-tar_bsd=tar_bsd_str.split(' ')
 
 
-if cleardestdir:
+if debug:
 	# rm -rf $destdir/*
 	shutil.rmtree(config['destdir'])
 	os.mkdir(config['destdir'])
@@ -78,23 +71,25 @@ if cleardestdir:
 os.chdir(config['backupdir'])
 
 
-pprint(tar_gnu_str)
-# ## wrap it up (create g-zipped tarball)
-# $tar_gnu || $tar_bsd
-call(tar_gnu)
+## wrap it up (create g-zipped tarball)
+tar = tarfile.open(backupfile, "w:gz")
+for name in config['files']:	
+	tar.add(name)
+tar.close()
+
+destdir = config['destdir']
+if debug:
+	destdir=os.path.join(homedir, 'tmp')
+
+if not os.path.exists(destdir):
+	os.path.mkdir(destdir)
 
 # ## move archive to destination
-# mv $backupfile ['destdir']/
 shutil.move(backupfile, config['destdir'])
 
 # #### this part is for debugging, you could impement backup rotations, etc. here
 
-# cd ['destdi']r
-os.chdir(config['destdir'])
-
-# ## extract the archive
-# tar xzvf $backupfile
-call(["tar", "xzvf", backupfile])
-
-# remove tmp dir
-shutil.rmtree(tmpdir)
+# cd destdir
+if debug:
+	os.chdir(config['destdir'])
+	call(["tar", "xzvf", os.path.join(config['destdir'], backupfile)])
