@@ -49,7 +49,8 @@ defaults = {
 	'files': ['./.git-completion.bash','./.gitconfig','./test/a','./test/one.txt','./test/b/c.txt','./Code/provision/']
 }
 profile = sys.argv[1]
-backupfile=os.path.join(rootdir, 'tmp', profile+'.tgz')
+backupfilename = profile+'.tgz'
+backupfile=os.path.join(rootdir, 'tmp', backupfilename)
 if not profile in profiles.keys():
 	print("Error: Invalid profile, '"+profile+"'. Configured profiles are: "+', '.join(profiles.keys()))
 	exit(1)
@@ -81,7 +82,7 @@ if not os.path.exists(destdir):
 	os.mkdir(destdir)
 
 ## move archive to destination
-shutil.move(backupfile, destdir)
+shutil.move(backupfile, os.path.join(destdir, backupfilename))
 
 
 ## if debugging, go to destdir (tmp) and unzip results
