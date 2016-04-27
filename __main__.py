@@ -13,7 +13,10 @@ rootdir = os.path.abspath(os.sep)
 homedir = os.path.expanduser('~') 
 appdir = os.path.join(homedir, '.bkup')
 if not os.path.exists(appdir):
-    os.makedirs(appdir)
+	print('* Creating ~/.bkup directory')
+	os.makedirs(appdir)
+    
+
 configfile = os.path.join(appdir, 'config')
 template="""import os
 
@@ -29,6 +32,7 @@ profiles = {
 """
 if not os.path.exists(configfile+'.py'):
 	with open(configfile+'.py', "w") as text_file:
+		print('* Creating ~/.bkup/config.py template file')
 		text_file.write(template)
 
 
@@ -38,7 +42,7 @@ from config import profiles
 
 ## arguments
 if len(sys.argv) != 2:
-	print("usage: bkup <profile>. Configured profiles are: "+', '.join(profiles.keys()))
+	print("Usage: bkup <profile>. Configured profiles are: "+', '.join(profiles.keys()))
 	exit(1)
 
 
@@ -58,6 +62,10 @@ config = profiles[profile]
 for key in defaults.keys():
 	if not key in config:
 		config[key] = defaults[key]
+
+if len(config['files']) == 0:
+	print('* File list is empty for '+profile+' add files to the profile in ~/.bkup/config.py')
+	exit(0)
 
 ## if debugging, use ~/tmp as destdir and clear it
 destdir = config['destdir']
