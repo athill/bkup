@@ -3,20 +3,23 @@
 import os, shutil, sys, tarfile
 from subprocess import call, check_call
 from pprint import pprint
+from cypher import Cypher
 
-### 
-debug=False
 
+### will create backup in ~/tmp and extract results
+debug=True
+
+# root directories
 rootdir = os.path.abspath(os.sep)
+homedir = os.path.expanduser('~') 
 
 ### set up app directory, if not set up
-homedir = os.path.expanduser('~') 
 appdir = os.path.join(homedir, '.bkup')
 if not os.path.exists(appdir):
 	print('* Creating ~/.bkup directory')
 	os.makedirs(appdir)
     
-
+# create template config file, if it does not exist
 configfile = os.path.join(appdir, 'config')
 template="""import os
 
@@ -26,7 +29,8 @@ profiles = {
 	'home': {
 		'backupdir': homedir,
 		'destdir': os.path.join(homedir, 'tmp'),
-		'files': []
+		'files': [
+		]
 	}	
 }
 """
@@ -34,7 +38,6 @@ if not os.path.exists(configfile+'.py'):
 	with open(configfile+'.py', "w") as text_file:
 		print('* Creating ~/.bkup/config.py template file')
 		text_file.write(template)
-
 
 ## load profiles
 sys.path.append(os.path.dirname(os.path.expanduser(configfile)))
@@ -71,9 +74,11 @@ if len(config['files']) == 0:
 destdir = config['destdir']
 if debug:
 	destdir=os.path.join(homedir, 'tmp')
-	shutil.rmtree(destdir)
-	os.mkdir(destdir)
+	if os.path.exists(destdir):
+		shutil.rmtree(destdir)
 
+# verify destination directory exists		
+os.makedirs(destdir)
 
 ## go to back up direcroty
 os.chdir(config['backupdir'])
@@ -85,9 +90,6 @@ for name in config['files']:
 	tar.add(name)
 tar.close()
 
-## create destdir it it doesn't exist
-if not os.path.exists(destdir):
-	os.mkdir(destdir)
 
 ## move archive to destination
 shutil.move(backupfile, os.path.join(destdir, backupfilename))
@@ -96,4 +98,5 @@ shutil.move(backupfile, os.path.join(destdir, backupfilename))
 ## if debugging, go to destdir (tmp) and unzip results
 if debug:
 	os.chdir(destdir)
-	call(["tar", "xzvf", os.path.join(destdir, backupfile)])
+	tar = tarfile.open(backupfilename, "r:gz")
+	tar.extractall()
