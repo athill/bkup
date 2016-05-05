@@ -17,34 +17,34 @@ homedir = os.path.expanduser('~')
 ##### encryption proof of concept
 
 
-tmpdir = os.path.join(homedir, 'tmp')
-os.chdir(os.path.join(homedir, 'tmp'));
-filename = 'home.tgz'
+# tmpdir = os.path.join(homedir, 'tmp')
+# os.chdir(os.path.join(homedir, 'tmp'));
+# filename = 'home.tgz'
 
-# get password
-password = 'foobar'
-# encrypt password
-hashed = hashlib.md5(password).hexdigest()
-offset = len(encrypted)
+# # get password
+# password = 'foobar'
+# # encrypt password
+# hashed = hashlib.md5(password).hexdigest()
+# offset = len(encrypted)
 
-# get file contents
-filecontents = open(filename).read()
-# encode file contents based on password
-cypher = Cypher(password)
-encodedfile = cypher.encode(filecontents)
+# # get file contents
+# filecontents = open(filename).read()
+# # encode file contents based on password
+# cypher = Cypher(password)
+# encodedfile = cypher.encode(filecontents)
 
-# concatenate encrypted password with encoded file
-simplecrypt = hashed + encodedfile
+# # concatenate encrypted password with encoded file
+# simplecrypt = hashed + encodedfile
 
-with open(filename+'.sc', "w") as text_file:
-    text_file.write(simplecrypt)
+# with open(filename+'.sc', "w") as text_file:
+#     text_file.write(simplecrypt)
 
-## opening
-# separate hashed password from encoded file (based on length of hashed password)
-# verify hashed password is same as user supplied when hashed
-# use password to decode encoded file
+# ## opening
+# # separate hashed password from encoded file (based on length of hashed password)
+# # verify hashed password is same as user supplied when hashed
+# # use password to decode encoded file
 
-exit()
+# exit()
 
 #####
 
