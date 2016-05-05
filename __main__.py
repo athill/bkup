@@ -14,42 +14,6 @@ rootdir = os.path.abspath(os.sep)
 homedir = os.path.expanduser('~') 
 
 
-##### encryption proof of concept
-
-
-# tmpdir = os.path.join(homedir, 'tmp')
-# os.chdir(os.path.join(homedir, 'tmp'));
-# filename = 'home.tgz'
-
-# # get password
-# password = 'foobar'
-# # encrypt password
-# hashed = hashlib.md5(password).hexdigest()
-# offset = len(encrypted)
-
-# # get file contents
-# filecontents = open(filename).read()
-# # encode file contents based on password
-# cypher = Cypher(password)
-# encodedfile = cypher.encode(filecontents)
-
-# # concatenate encrypted password with encoded file
-# simplecrypt = hashed + encodedfile
-
-# with open(filename+'.sc', "w") as text_file:
-#     text_file.write(simplecrypt)
-
-# ## opening
-# # separate hashed password from encoded file (based on length of hashed password)
-# # verify hashed password is same as user supplied when hashed
-# # use password to decode encoded file
-
-# exit()
-
-#####
-
-
-
 ### set up app directory, if not set up
 appdir = os.path.join(homedir, '.bkup')
 if not os.path.exists(appdir):
@@ -90,19 +54,22 @@ if len(sys.argv) != 2:
 defaults = {
 	'backupdir': homedir,
 	'destdir': os.path.join(homedir, 'tmp'),
-	'files': ['./.git-completion.bash','./.gitconfig','./test/a','./test/one.txt','./test/b/c.txt','./Code/provision/']
+	'files': []
 }
+## TODO: argparse
 profile = sys.argv[1]
+# create target file
 backupfilename = profile+'.tgz'
 backupfile=os.path.join(rootdir, 'tmp', backupfilename)
+## validate profile name
 if not profile in profiles.keys():
 	print("Error: Invalid profile, '"+profile+"'. Configured profiles are: "+', '.join(profiles.keys()))
 	exit(1)
+## set up config
 config = profiles[profile]
 for key in defaults.keys():
 	if not key in config:
 		config[key] = defaults[key]
-
 if len(config['files']) == 0:
 	print('* File list is empty for '+profile+' add files to the profile in ~/.bkup/config.py')
 	exit(0)
