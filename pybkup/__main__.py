@@ -4,5 +4,5 @@
 """bkup.__main__: executed when bootstrap directory is called as script."""
 
 
-from .bkup import main
+from .pybkup import main
 main()

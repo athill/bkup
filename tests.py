@@ -1,5 +1,5 @@
 import unittest, os, shutil, datetime, time, tarfile
-from bkup.bkup import Bkup, Cli
+from pybkup.pybkup import Bkup, Cli
 
 counter = 0
 
