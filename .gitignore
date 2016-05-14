@@ -1,1 +1,9 @@
-cypher.pyc
+### suffixes
+*.pyc
+
+### build files
+build/
+dist/
+*.egg-info/
+venv/
+setuptools*
