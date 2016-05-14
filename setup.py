@@ -4,16 +4,11 @@
 
 """setup.py: setuptools control."""
 
+import ez_setup
+ez_setup.use_setuptools()
 
-import re
 from setuptools import setup
 
-
-version = re.search(
-    '^__version__\s*=\s*"(.*)"',
-    open('bkup/bkup.py').read(),
-    re.M
-    ).group(1)
 
 
 with open("readme.md", "rb") as f:
@@ -26,7 +21,7 @@ setup(
     entry_points = {
         "console_scripts": ['bkup = bkup.bkup:main']
         },
-    version = version,
+    version = '0.8.0',
     description = "Archive files and folders.",
     long_description = long_descr,
     author = "Andy Hill",
