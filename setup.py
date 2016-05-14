@@ -16,15 +16,15 @@ with open("readme.md", "rb") as f:
 
 
 setup(
-    name = "bkup",
-    packages = ["bkup"],
+    name = "pybkup",
+    packages = ["pybkup"],
     entry_points = {
-        "console_scripts": ['bkup = bkup.bkup:main']
+        "console_scripts": ['pybkup = pybkup.pybkup:main']
         },
     version = '0.8.0',
     description = "Archive files and folders.",
     long_description = long_descr,
     author = "Andy Hill",
     author_email = "andy@andyhill.us",
-    url = "https://github.com/athill/bkup",
+    url = "https://github.com/athill/pybkup",
     )
