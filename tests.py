@@ -19,7 +19,7 @@ class BkupTest(unittest.TestCase):
 
 	def testBackupFiles(self):
 		filename1 = 'foo.txt'
-		filename2 = '.foo'
+		filename2 = '.bar'
 		## add files to directory
 		self.helpers.write_file(os.path.join(self.__srcdir, filename1), 'foo bar baz')
 		self.helpers.write_file(os.path.join(self.__srcdir, filename2), 'bada bing')
@@ -36,8 +36,8 @@ class BkupTest(unittest.TestCase):
 
 	def testBackupDirectory(self):
 		dirname = 'foo'
-		filename1 = 'foo.txt'
-		filename2 = '.foo'		
+		filename1 = 'bar.txt'
+		filename2 = '.baz'		
 		srcdirpath = os.path.join(self.__srcdir, dirname)
 		os.mkdir(srcdirpath)
 		self.helpers.write_file(os.path.join(srcdirpath, filename1), 'foo bar baz')
