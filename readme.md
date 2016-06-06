@@ -16,3 +16,9 @@ Requires config file at ~/.bkup/config.py, for example:
 		},
 		...
 	}
+
+You can then backup (as a gzipped tarball) configured files/directories from <name>'s <backupdir> to <name>'s <destdir> via
+	
+	cd /path/to/bkup
+	python . <name>
+
