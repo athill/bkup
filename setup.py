@@ -4,8 +4,6 @@
 
 """setup.py: setuptools control."""
 
-import ez_setup
-ez_setup.use_setuptools()
 
 from setuptools import setup
 
@@ -16,15 +14,15 @@ with open("readme.md", "rb") as f:
 
 
 setup(
-    name = "pybkup",
-    packages = ["pybkup"],
+    name = "bkup",
+    packages = ["bkup"],
     entry_points = {
-        "console_scripts": ['pybkup = pybkup.pybkup:main']
+        "console_scripts": ['bkup = bkup.bkup:main']
         },
-    version = '0.8.0',
+    version = '0.9.2',
     description = "Archive files and folders.",
     long_description = long_descr,
     author = "Andy Hill",
     author_email = "andy@andyhill.us",
-    url = "https://github.com/athill/pybkup",
-    )
+    url = "https://github.com/athill/bkup",
+)
