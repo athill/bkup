@@ -1,5 +1,7 @@
 # bkup
 
+## Archived. Didn't really get everything working, I don't think.
+
 Trying to simplify backups. 
 
 Requires config file at ~/.bkup/config.py, for example:
